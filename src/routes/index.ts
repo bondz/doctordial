@@ -1,13 +1,10 @@
 import { Router } from 'express';
 
+import { signupHandler, loginHandler } from '../controllers/auth';
+
 const router = Router();
 
-router.post('/login', function(req, res, next) {
-  res.status(200).send('Login');
-});
-
-router.post('/signup', (_req, res) => {
-  res.status(200).send('Signup');
-});
+router.post('/login', loginHandler);
+router.post('/signup', signupHandler);
 
 export default router;
