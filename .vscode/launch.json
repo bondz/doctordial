@@ -14,7 +14,8 @@
       "smartStep": true,
       "env": {
         "PORT": "3005",
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "JWT_SECRET": "<insert-a-r3ally-l0ng-str1ng-h3re.>"
       }
     }
   ]
