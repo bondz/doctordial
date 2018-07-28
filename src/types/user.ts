@@ -11,6 +11,10 @@ const UserType = new GraphQLObjectType(<GraphQLObjectTypeConfig<IUser, any>>{
   description:
     'Describes a user (patient or doctor) who signs up using the doctordial service',
   fields: () => ({
+    id: {
+      type: GraphQLString,
+      description: 'The ID of this user',
+    },
     firstName: {
       type: GraphQLString,
       description: 'The first name of the user',
