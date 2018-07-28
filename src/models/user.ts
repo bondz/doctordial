@@ -1,4 +1,5 @@
 export interface IUser {
+  id: string;
   firstName: string;
   lastName: string;
   isDoctor: boolean;
@@ -12,6 +13,7 @@ export interface IUser {
 
 const users: IUser[] = [
   {
+    id: '​​​​​109b7b5e-8b79-4d10-95e9-47296023eddd0',
     firstName: 'John',
     lastName: 'Doe',
     isDoctor: true,
@@ -23,6 +25,7 @@ const users: IUser[] = [
     password: 'an-encrypted-string',
   },
   {
+    id: '24865076-fc92-4883-b29b-a6054de27b7b',
     firstName: 'Jane',
     lastName: 'Doe',
     isDoctor: false,
@@ -34,6 +37,7 @@ const users: IUser[] = [
     password: 'a-different-encrypted-string',
   },
   {
+    id: 'f19ea6cb-fc93-4299-a525-e0ca7de5d216',
     firstName: 'Maddie',
     lastName: 'McAvoy',
     isDoctor: true,

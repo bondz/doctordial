@@ -2,6 +2,7 @@ import express from 'express';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import joi from 'joi';
+import { v4 } from 'uuid';
 
 import logger from '../logger';
 import User from '../models/user';
@@ -101,6 +102,7 @@ export async function signupHandler(
   const isPatient = !request.isDoctor;
 
   const newUser = {
+    id: v4(),
     ...rest,
     accountVerified: false,
     isDoctor,
