@@ -28,7 +28,7 @@ const QuestionType = new GraphQLObjectType(<
     author: {
       type: UserType,
       description: 'The user who created the question',
-      resolve: question => User[question.author],
+      resolve: question => User.find(u => u.id === question.author),
     },
     answers: {
       type: new GraphQLList(AnswerType),
@@ -46,9 +46,7 @@ const AnswerType = new GraphQLObjectType(<
     author: {
       type: UserType,
       description: 'The user who created this answer',
-      resolve: answer => {
-        return null;
-      },
+      resolve: answer => User.find(u => u.id === answer.author),
     },
     text: {
       type: GraphQLString,

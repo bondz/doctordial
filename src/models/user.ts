@@ -13,7 +13,7 @@ export interface IUser {
 
 const users: IUser[] = [
   {
-    id: '​​​​​109b7b5e-8b79-4d10-95e9-47296023eddd0',
+    id: '109b7b5e-8b79-4d10-95e9-47296023eddd0',
     firstName: 'John',
     lastName: 'Doe',
     isDoctor: true,
