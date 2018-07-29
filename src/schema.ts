@@ -5,6 +5,7 @@ import {
   GraphQLNonNull,
   GraphQLList,
 } from 'graphql';
+import { v4 } from 'uuid';
 
 import QuestionType from './types/question';
 import questionBank from './models/questions-bank';
@@ -44,14 +45,66 @@ const mutation = new GraphQLObjectType({
     // removeDoctor,
     // deletePatient,
     // blockPatient,
-    // createQuestion,
-    // answerQuestion
+    createQuestion: {
+      type: QuestionType,
+      description: 'Create a question',
+      args: {
+        text: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The text of the question you want to create',
+        },
+      },
+      resolve: (_, { text }, { req }) => {
+        const newQuestion = {
+          id: v4(),
+          text,
+          answers: [],
+          author: req.user.id,
+        };
+
+        questionBank.push(newQuestion);
+
+        return newQuestion;
+      },
+    },
+    answerQuestion: {
+      type: QuestionType,
+      description: 'Create an answer to an already asked question',
+      args: {
+        text: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The text containing the answer to the question',
+        },
+        questionID: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The ID of the question to answer',
+        },
+      },
+      resolve: (_, { text, questionID }, { req }) => {
+        const question = questionBank.find(q => q.id === questionID);
+        if (!question) {
+          throw new Error('Question with this ID does not exist.');
+        }
+
+        const newAnswer = {
+          id: v4(),
+          text,
+          author: req.user.id,
+          upvotes: 0,
+          downvotes: 0,
+        };
+
+        question.answers.push(newAnswer);
+
+        return question;
+      },
+    },
   }),
 });
 
 const schema = new GraphQLSchema({
   query,
-  // mutation,
+  mutation,
 });
 
 export default schema;
