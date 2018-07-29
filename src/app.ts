@@ -7,6 +7,7 @@ import graphQLHTTP from 'express-graphql';
 import path from 'path';
 import nunjucks from 'nunjucks';
 
+import authMiddleware from './routes/middleware/auth';
 import logger from './logger';
 import schema from './schema';
 
@@ -54,8 +55,32 @@ nunjucks.configure('views', {
 // Load routes
 app.use('/api', index);
 
+/**
+ * What follows allows only authenticated users to access our graphql endpoint.
+ * Graphql uses post requests exclusively when fetching data, just making sure we
+ * do not respond to those requests unless the user is authenticated
+ */
+app.post(
+  '/graphql',
+  authMiddleware,
+  graphQLHTTP(req => ({
+    schema,
+    graphiql: false,
+    context: {
+      req,
+    },
+  }))
+);
+
+/**
+ * We however want to keep using the nice graphiql interface, so, we modify the interface
+ * @see public\graphql to send the Authorization header token for every request.
+ * We cannot unforunately limit it to only get requests, which is what we want, because
+ * then express wouldn't use the static route.
+ */
 app.use(
   '/graphql',
+  express.static(path.join(__dirname, '../', 'public/graphql')),
   graphQLHTTP({
     schema,
     graphiql: true,
