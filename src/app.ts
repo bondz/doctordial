@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
 import graphQLHTTP from 'express-graphql';
+import path from 'path';
+import nunjucks from 'nunjucks';
 
 import logger from './logger';
 import schema from './schema';
@@ -42,6 +44,12 @@ app.use(compression());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, '../public')));
+app.set('views', path.join(__dirname, '../views'));
+nunjucks.configure('views', {
+  autoescape: true,
+  express: app,
+});
 
 // Load routes
 app.use('/api', index);
@@ -53,6 +61,10 @@ app.use(
     graphiql: true,
   })
 );
+
+app.use('/', (_, res) => {
+  res.render('index.html');
+});
 
 // catch 404 and forward to error handler
 app.use((req, _res, next) => {
