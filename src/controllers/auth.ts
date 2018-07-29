@@ -147,7 +147,10 @@ function comparePassword(
 }
 
 async function generateToken(user: any): Promise<string> {
-  return jwtSignAsync(user, process.env.JWT_SECRET, {
+  // Make sure we don't accidentally add the user password to the tokenized string.
+  const { password, confirmPassword, ...rest } = user;
+
+  return jwtSignAsync(rest, process.env.JWT_SECRET, {
     expiresIn: '1d',
     issuer: 'Doctordial',
   });
