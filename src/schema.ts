@@ -9,11 +9,18 @@ import { v4 } from 'uuid';
 
 import QuestionType from './types/question';
 import questionBank from './models/questions-bank';
+import UserType from './types/user';
+import Users from './models/user';
 
 const query = new GraphQLObjectType({
   name: 'Query',
   description: 'The query root of Doctordial service.',
   fields: () => ({
+    users: {
+      type: new GraphQLList(UserType),
+      description: 'Returns all registered users',
+      resolve: () => Users,
+    },
     question: {
       type: QuestionType,
       description: 'Gets a single question',
