@@ -1,0 +1,181 @@
+{% extends "layout.html" %} {% block content %}
+<form class="form-signin" id="signin-form">
+  <img class="mb-4" src="/images/doctordial.svg" alt="" width="72" height="72">
+  <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+  <label for="signin-email" class="sr-only">Email address</label>
+  <input type="email" id="signin-email" class="form-control" placeholder="Email address" required autofocus>
+  <label for="signin-pwd" class="sr-only">Password</label>
+  <input type="password" id="signin-pwd" class="form-control" placeholder="Password" required>
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  <p class="mt-5 mb-3 text-muted">&copy; 2018</p>
+</form>
+
+<form class="needs-validation" id="signup-form">
+  <h4 class="mb-3">Signup</h4>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="firstName">First name</label>
+      <input class="form-control" id="firstName" placeholder="" value="" required="" type="text">
+      <div class="invalid-feedback">
+        Valid first name is required.
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="lastName">Last name</label>
+      <input class="form-control" id="lastName" placeholder="" value="" required="" type="text">
+      <div class="invalid-feedback">
+        Valid last name is required.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="email">Email</label>
+      <input class="form-control" id="email" placeholder="" value="" required="" type="email">
+      <div class="invalid-feedback">
+        Valid email is required.
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="phone">Phone number</label>
+      <input class="form-control" id="phone" placeholder="" value="" required="" type="tel">
+      <div class="invalid-feedback">
+        Valid phone is required.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="password">Password</label>
+      <input class="form-control" id="password" placeholder="" value="" required="" type="password" min="8">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="confirmation">Confirm password</label>
+      <input class="form-control" id="confirmation" placeholder="" value="" required="" type="password" min="8">
+    </div>
+  </div>
+
+  <h4 class="mb-3">Account type</h4>
+
+  <div class="d-block my-3">
+    <div class="custom-control custom-radio">
+      <input id="isDoctor" name="isDoctor" class="custom-control-input" type="checkbox">
+      <label class="custom-control-label" for="isDoctor">Doctor?</label>
+    </div>
+  </div>
+
+  <hr class="mb-4">
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Signup</button>
+</form>
+</div>
+<script>
+  function onSignIn(e) {
+    e.preventDefault();
+
+    /**
+     * In a production app, you would polyfill fetch.
+     */
+    localStorage.removeItem('doctordial-token');
+    var email = document.getElementById('signin-email').value;
+    var password = document.getElementById('signin-pwd').value;
+
+    fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'omit'
+    })
+      .then(res => {
+        if (res.status >= 400) {
+          alert('Invalid credentials, please login with correct credentials')
+
+          return;
+        }
+
+        return res.json();
+      })
+      .then(msg => {
+        if (!msg) { return }
+
+        if (!msg.token) {
+          alert('Server error, please try again later');
+          navigator.sendBeacon('/api/log', new Blob([JSON.stringify({ msg: 'Absent token' })], { type: 'application/json' }));
+
+          return;
+        }
+
+        localStorage.setItem('doctordial-token', msg.token);
+        window.location.replace('/graphql');
+      })
+      .catch(err => {
+        alert('Server is unreachable, please try again later');
+        navigator.sendBeacon('/api/log', new Blob([JSON.stringify({ err })], { type: 'application/json' }));
+      })
+
+  }
+
+  function onSignUp(e) {
+    e.preventDefault();
+
+    localStorage.removeItem('doctordial-token');
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmation').value;
+    const isDoctor = document.getElementById('isDoctor').checked;
+
+    if (password !== confirmPassword) {
+      alert('Password and confirmation should match');
+      return;
+    }
+
+    const newUser = { firstName, lastName, email, phone, password, confirmPassword, isDoctor };
+
+    fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUser),
+      credentials: 'omit'
+    }).then(res => {
+      if (res.status >= 400) {
+        alert('There were erorrs in your form');
+
+        return;
+      }
+
+      return res.json();
+    }).then(msg => {
+      if (!msg) {
+        return;
+      }
+      console.log(msg);
+      if (!msg.token) {
+        alert('Server error, please try again later');
+        navigator.sendBeacon('/api/log', new Blob([JSON.stringify({ msg: 'Absent token' })], { type: 'application/json' }));
+
+        return;
+      }
+
+      localStorage.setItem('doctordial-token', msg.token);
+      window.location.replace('/graphql');
+    }).catch(err => {
+      alert('Server is unreachable, please try again later');
+      navigator.sendBeacon('/api/log', new Blob([JSON.stringify({ err })], { type: 'application/json' }));
+    })
+  }
+
+  const signinForm = document.getElementById('signin-form');
+  const signupForm = document.getElementById('signup-form');
+  signinForm.addEventListener('submit', onSignIn);
+  signupForm.addEventListener('submit', onSignUp);
+</script> {% endblock content %}
